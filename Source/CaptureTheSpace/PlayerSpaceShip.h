@@ -19,6 +19,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	UStaticMeshComponent* SpaceShipMesh;
 
+	//Pawn Movement
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UFloatingPawnMovement> PawnMovement;
+	
 	//Camera
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	class UCameraComponent* MyCamera;
@@ -62,20 +66,25 @@ public:
 	class UInputAction* ShootInput;
 	// Aim
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
-	class UInputAction* AimInput;
+	class UInputAction* TractorInput;
 	//----------------------Input Functions----------------------//
 	void MovementFunction(const FInputActionValue& input);
 	void UpDownMovementFunction(const FInputActionValue& input);
 	void CameraMovementFunction(const FInputActionValue& input);
 	void CameraDistanceFunction(const FInputActionValue& input);
 	void ShootFunction(const FInputActionValue& input);
-	void AimFunction(const FInputActionValue& input);
+	void TractorBeam();
+	
 	
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Movement")
 	float MovementSpeed = 50.f;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "Movement")
 	float RotateSpeed = 0.5f;
 
+	//Score
+	UPROPERTY(BlueprintReadOnly)
+	int Score = 0;
+	
 	//Camera Variables
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "CameraVar")
 	float CameraDistanceMin = 300.f;
@@ -106,4 +115,7 @@ private:
 	FVector AimLocation;
 	class UPrimitiveComponent* HitComponent;
 	FHitResult HitResult;
+
+	//Tractor Beam Variables
+	FHitResult TractorResult;
 };

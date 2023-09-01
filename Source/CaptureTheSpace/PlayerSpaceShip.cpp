@@ -14,6 +14,8 @@
 
 
 #include "Bullet.h"
+#include "Collectible.h"
+#include "GameFramework/FloatingPawnMovement.h"
 
 
 // Sets default values
@@ -29,6 +31,8 @@ APlayerSpaceShip::APlayerSpaceShip()
 	SpaceShipMesh->SetEnableGravity(false);
 	SpaceShipMesh->BodyInstance.bLockXRotation = true;
 	SpaceShipMesh->BodyInstance.bLockYRotation = true;
+
+	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>("Pawn Movement Component");
 	
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MySpringArm"));
 	MySpringArm->SetupAttachment(GetRootComponent());
@@ -68,6 +72,7 @@ void APlayerSpaceShip::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	LineTraceFromCamera(); 
 	MovementController(DeltaTime);
 }
 
@@ -83,14 +88,14 @@ void APlayerSpaceShip::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(CameraMovementInput, ETriggerEvent::Triggered, this, &APlayerSpaceShip::CameraMovementFunction);
 		EnhancedInputComponent->BindAction(CameraDistanceInout, ETriggerEvent::Triggered, this, &APlayerSpaceShip::CameraDistanceFunction);
 		EnhancedInputComponent->BindAction(ShootInput, ETriggerEvent::Started, this, &APlayerSpaceShip::ShootFunction);
-		EnhancedInputComponent->BindAction(AimInput, ETriggerEvent::Triggered, this, &APlayerSpaceShip::AimFunction);
+		EnhancedInputComponent->BindAction(TractorInput, ETriggerEvent::Triggered, this, &APlayerSpaceShip::TractorBeam);
 	}
 }
 
 void APlayerSpaceShip::MovementFunction(const FInputActionValue& input)
 {
-	SpaceShipMesh->AddImpulse(input.Get<FVector2D>().X * GetActorForwardVector() * 5000000 * GetWorld()->GetDeltaSeconds());
-	SpaceShipMesh->AddAngularImpulseInDegrees(FVector(0,0,input.Get<FVector2D>().Y*110000000));
+	AddMovementInput(GetActorForwardVector(),input.Get<FVector2D>().Y);
+	AddMovementInput(GetActorRightVector(),input.Get<FVector2D>().X);
 }
 
 void APlayerSpaceShip::UpDownMovementFunction(const FInputActionValue& input)
@@ -100,6 +105,7 @@ void APlayerSpaceShip::UpDownMovementFunction(const FInputActionValue& input)
 
 void APlayerSpaceShip::CameraMovementFunction(const FInputActionValue& input)
 {
+	SpaceShipMesh->AddAngularImpulseInDegrees(FVector(0,0,input.Get<FVector2D>().X*115000000));
 	AddControllerYawInput(input.Get<FVector2D>().X);
 	AddControllerPitchInput(-input.Get<FVector2D>().Y);
 }
@@ -127,9 +133,22 @@ void APlayerSpaceShip::ShootFunction(const FInputActionValue& input)
 	
 }
 
-void APlayerSpaceShip::AimFunction(const FInputActionValue& input)
+void APlayerSpaceShip::TractorBeam()
 {
-	LineTraceFromCamera();
+	TArray<AActor*> ActorsToIgnore;
+	ActorsToIgnore.Add(this);
+	
+	UKismetSystemLibrary::SphereTraceSingle(GetWorld(),MyCamera->GetComponentLocation(),
+		MyCamera->GetComponentLocation() + MyCamera->GetForwardVector() * 10000,100,TraceTypeQuery1,
+		false,ActorsToIgnore,EDrawDebugTrace::None,TractorResult,true);
+
+	if(TractorResult.bBlockingHit)
+	{
+		if(ACollectible* CollectibleActor = Cast<ACollectible>(TractorResult.GetActor()))
+		{
+			CollectibleActor->Mesh->AddImpulse((GetActorLocation()-CollectibleActor->GetActorLocation())*1000*GetWorld()->DeltaTimeSeconds);
+		}
+	}
 }
 
 void APlayerSpaceShip::MovementController(float DeltaTime)
