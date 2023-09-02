@@ -6,18 +6,22 @@
 #include "PlayerSpaceShip.h"
 #include "Chaos/GeometryParticlesfwd.h"
 #include "Components/SphereComponent.h"
+#include "GameFramework/RotatingMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ACollectible::ACollectible()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	SetRootComponent(Mesh);
 	Mesh->SetSimulatePhysics(true);
 	Mesh->SetEnableGravity(false);
 
+	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>("Rotating Movement");
+	
 	Collider = CreateDefaultSubobject<USphereComponent>("Collider");
 	Collider->SetupAttachment(GetRootComponent());
 }
@@ -29,18 +33,13 @@ void ACollectible::BeginPlay()
 	this->OnActorBeginOverlap.AddDynamic(this, &ACollectible::OnOverlapBegin);
 }
 
-// Called every frame
-void ACollectible::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
 void ACollectible::OnOverlapBegin(AActor* OverlappedActor, AActor* OtherActor)
 {
 	if(OtherActor->IsA<APlayerSpaceShip>())
 	{
 		APlayerSpaceShip* PlayerSpaceShip = Cast<APlayerSpaceShip>(OtherActor);
-		PlayerSpaceShip->Score++;
+		PlayerSpaceShip->Score+=1*PlayerSpaceShip->GoldIncrease;
+		UGameplayStatics::PlaySound2D(GetWorld(),PickUpSound);
 		Destroy();
 	}
 }

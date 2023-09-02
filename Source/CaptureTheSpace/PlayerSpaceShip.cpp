@@ -9,13 +9,16 @@
 #include "GameFramework/SpringArmComponent.h"
 
 //EnhancedInput
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 
 
 #include "Bullet.h"
 #include "Collectible.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
+#include "Kismet/GameplayStatics.h"
 
 
 // Sets default values
@@ -88,7 +91,11 @@ void APlayerSpaceShip::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(CameraMovementInput, ETriggerEvent::Triggered, this, &APlayerSpaceShip::CameraMovementFunction);
 		EnhancedInputComponent->BindAction(CameraDistanceInout, ETriggerEvent::Triggered, this, &APlayerSpaceShip::CameraDistanceFunction);
 		EnhancedInputComponent->BindAction(ShootInput, ETriggerEvent::Started, this, &APlayerSpaceShip::ShootFunction);
+
+		//Beam Input
 		EnhancedInputComponent->BindAction(TractorInput, ETriggerEvent::Triggered, this, &APlayerSpaceShip::TractorBeam);
+		EnhancedInputComponent->BindAction(TractorInput, ETriggerEvent::Started, this, &APlayerSpaceShip::TractorBeamStarted);
+		EnhancedInputComponent->BindAction(TractorInput, ETriggerEvent::Completed, this, &APlayerSpaceShip::TractorBeamReleased);
 	}
 }
 
@@ -105,7 +112,7 @@ void APlayerSpaceShip::UpDownMovementFunction(const FInputActionValue& input)
 
 void APlayerSpaceShip::CameraMovementFunction(const FInputActionValue& input)
 {
-	SpaceShipMesh->AddAngularImpulseInDegrees(FVector(0,0,input.Get<FVector2D>().X*115000000));
+	SetActorRotation(FRotator(0.f,GetControlRotation().Yaw,0.f));
 	AddControllerYawInput(input.Get<FVector2D>().X);
 	AddControllerPitchInput(-input.Get<FVector2D>().Y);
 }
@@ -117,19 +124,25 @@ void APlayerSpaceShip::CameraDistanceFunction(const FInputActionValue& input)
 
 void APlayerSpaceShip::ShootFunction(const FInputActionValue& input)
 {
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.Owner = this;
-	ABullet* CurrentBullet;
-	CurrentBullet = GetWorld()->SpawnActor<ABullet>(
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.Owner = this;
+		ABullet* CurrentBullet;
+		UGameplayStatics::PlaySound2D(GetWorld(),ShootingSound);
+	for(int i = 0; i<AmountOfShots;i++)
+	{
+		CurrentBullet = GetWorld()->SpawnActor<ABullet>(
 		BulletClass,
-		GetActorLocation()+(GetActorForwardVector()*100),
+		GetActorLocation()+(GetActorForwardVector()*200*i),
 		(AimLocation- GetActorLocation() + (GetActorForwardVector()*100)).GetSafeNormal().Rotation(),
 		SpawnParameters);
-
-	if (HitComponent && !AimLocation.IsNearlyZero())
-	{
-		CurrentBullet->SetUpBulletTarget(HitComponent, AimLocation);
+		if (HitComponent && !AimLocation.IsNearlyZero())
+		{
+			CurrentBullet->BulletSpeed = BulletSpeed;
+			CurrentBullet->SetUpBulletTarget(HitComponent, AimLocation);
+		}
 	}
+
+
 	
 }
 
@@ -146,9 +159,20 @@ void APlayerSpaceShip::TractorBeam()
 	{
 		if(ACollectible* CollectibleActor = Cast<ACollectible>(TractorResult.GetActor()))
 		{
-			CollectibleActor->Mesh->AddImpulse((GetActorLocation()-CollectibleActor->GetActorLocation())*1000*GetWorld()->DeltaTimeSeconds);
+			CollectibleActor->Mesh->AddImpulse((GetActorLocation()-CollectibleActor->GetActorLocation())*5000*GetWorld()->DeltaTimeSeconds);
 		}
 	}
+}
+
+void APlayerSpaceShip::TractorBeamStarted()
+{
+	SpawnedSound = UGameplayStatics::SpawnSound2D(GetWorld(),BeamSound);
+}
+
+void APlayerSpaceShip::TractorBeamReleased()
+{
+	SpawnedSound->Stop();
+	SpawnedSound->DestroyComponent();
 }
 
 void APlayerSpaceShip::MovementController(float DeltaTime)
