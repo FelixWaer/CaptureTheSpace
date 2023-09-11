@@ -7,6 +7,8 @@
 #include "Kismet/KismetMaterialLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+#include "BattleStation.h"
+
 // Sets default values
 ABullet::ABullet()
 {
@@ -71,18 +73,30 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 		Destroy();
 		OtherActor->Destroy();
 	}
-}
+	
 
-void ABullet::MovementFunction(float DeltaTime)
-{
-	//Rotate To target if it has one
-	if(HasTarget && !AimCursor->GetComponentLocation().IsNearlyZero())
+	if (OtherActor->ActorHasTag("Station"))
 	{
-		FVector LookVector = AimCursor->GetComponentLocation() - GetActorLocation();
-		LookVector.Normalize();
-		SetActorRotation(LookVector.Rotation());
+		ABattleStation* Station = Cast<ABattleStation>(OtherActor);
+		if(Station)
+		{
+			if (Station->Enemy == true)
+			{
+				Station->TakeDamage(BulletDamage);
+			}
+			Destroy();
+		}
 	}
-	//Moves forward
-	AddActorWorldOffset(GetActorForwardVector() * BulletSpeed * DeltaTime);
 }
-
+	void ABullet::MovementFunction(float DeltaTime)
+	{
+		//Rotate To target if it has one
+		if(HasTarget && !AimCursor->GetComponentLocation().IsNearlyZero())
+		{
+			FVector LookVector = AimCursor->GetComponentLocation() - GetActorLocation();
+			LookVector.Normalize();
+			SetActorRotation(LookVector.Rotation());
+		}
+		//Moves forward
+		AddActorWorldOffset(GetActorForwardVector() * BulletSpeed * DeltaTime);
+	}

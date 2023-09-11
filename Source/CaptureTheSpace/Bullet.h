@@ -25,7 +25,7 @@ public:
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "MyVariables")
 	float BulletSpeed = 10000;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "MyVariables")
-	float BulletDamage = 10;
+	float BulletDamage = 1;
 	UPROPERTY(EditAnywhere,BlueprintReadWrite,Category = "MyVariables")
 	float BulletLifeTime = 10;
 	
