@@ -137,7 +137,7 @@ void APlayerSpaceShip::ShootFunction(const FInputActionValue& input)
 		SpawnParameters);
 		if (HitComponent && !AimLocation.IsNearlyZero())
 		{
-			CurrentBullet->BulletSpeed = BulletSpeed;
+			CurrentBullet->BulletSpeed = BulletSpeed;   //Av en eller annen grunn crasher Unreal om jeg skyter for mange bullets -Aslak
 			CurrentBullet->SetUpBulletTarget(HitComponent, AimLocation);
 		}
 	}

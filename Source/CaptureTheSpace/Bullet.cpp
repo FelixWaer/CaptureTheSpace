@@ -69,18 +69,18 @@ void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherA
 	//Check if hit actor has ENEMY TAG
 	if(OtherActor->ActorHasTag("Enemy"))
 	{
-		//DO STUFF TO ACTOR WITH ENEMY TAG
+		
 		Destroy();
 		OtherActor->Destroy();
 	}
 	
-
+//check if hit actor has STATION TAG
 	if (OtherActor->ActorHasTag("Station"))
 	{
 		ABattleStation* Station = Cast<ABattleStation>(OtherActor);
 		if(Station)
 		{
-			if (Station->Enemy == true)
+			if (Station->IsEnemy == true)
 			{
 				Station->TakeDamage(BulletDamage);
 			}

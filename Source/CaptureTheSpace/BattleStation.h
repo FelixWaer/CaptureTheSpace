@@ -18,7 +18,7 @@ public:
 
 	//Create a state machine for the battle station with the states enemy and friendly
 UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Variables")
-	bool Enemy;
+	bool IsEnemy;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Variable")
     		UStaticMeshComponent* Mesh;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Variable")

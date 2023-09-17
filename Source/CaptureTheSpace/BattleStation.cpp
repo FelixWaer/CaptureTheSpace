@@ -4,6 +4,8 @@
 #include "BattleStation.h"
 
 // Sets default values
+
+// Viktig!! Hvis bluePrint slettes så må du legge til tag Station i blueprintet og ticke av enemy når blueprint er ut i verden!!!! 
 ABattleStation::ABattleStation()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -20,7 +22,7 @@ ABattleStation::ABattleStation()
 void ABattleStation::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SwapColor();
 }
 
 // Called every frame
@@ -31,6 +33,7 @@ void ABattleStation::Tick(float DeltaTime)
 
 void ABattleStation::TakeDamage(int Damage)
 {
+	// tar skade, dette skjer i bullet.cpp
 	UE_LOG(LogTemp, Warning, TEXT("FouckYou"));
 	Health -= Damage;
 	if (Health <= 0)
@@ -41,15 +44,14 @@ void ABattleStation::TakeDamage(int Damage)
 
 void ABattleStation::OnDefeat()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BattleStation Defeated"));
-	
-	if (Enemy == true)
+	//når battlestation blir defeated så bytter den lag og farge
+	if (IsEnemy == true)
 	{
-	Enemy = false;	
+	IsEnemy = false;	
 	}
 	else
 	{
-		Enemy = true;
+		IsEnemy = true;
 	}
 	SwapColor();
 	Health = MaxHealth;
@@ -57,15 +59,15 @@ void ABattleStation::OnDefeat()
 
 void ABattleStation::SwapColor()
 {
-	if (Enemy == true)
+	if (IsEnemy == true)
 	{
 		Mesh->SetMaterial(1, EnemyMaterial);
-		//write text on screen that says enemy
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Enemy")));
+		
+		
 	}
 	else
 	{
 		Mesh->SetMaterial(1, FriendlyMaterial);
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Friendly")));
+		//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Friendly")));
 	}
 }
