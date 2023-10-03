@@ -20,6 +20,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	UStaticMeshComponent* SpaceShipMesh;
 
+	//AllyStatickMesh
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
+	UStaticMeshComponent* AllyShipMesh;
+
 	//Pawn Movement
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class UFloatingPawnMovement> PawnMovement;
@@ -27,9 +31,12 @@ public:
 	//Camera
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	class UCameraComponent* MyCamera;
-	//SpringArm
+	//Camera SpringArm
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	class USpringArmComponent* MySpringArm;
+	//AllySpringArm
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
+	class USpringArmComponent* AllySpringArm;
 	//AimTarget
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	class USceneComponent* AimCursor;
@@ -95,6 +102,8 @@ public:
 	int AmountOfShots = 1;
 	UPROPERTY(BlueprintReadWrite)
 	int GoldIncrease = 1;
+	UPROPERTY(BlueprintReadWrite)
+	bool Ally = false;
 	
 	
 	//Camera Variables

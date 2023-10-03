@@ -36,9 +36,26 @@ APlayerSpaceShip::APlayerSpaceShip()
 	SpaceShipMesh->BodyInstance.bLockYRotation = true;
 
 	PawnMovement = CreateDefaultSubobject<UFloatingPawnMovement>("Pawn Movement Component");
+
+	// AllySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("AllySpringArm"));
+	// AllySpringArm->SetupAttachment(GetRootComponent());
+	// AllySpringArm->bUsePawnControlRotation = true;
+	// AllySpringArm->bEnableCameraLag = true;
+	// AllySpringArm->bEnableCameraRotationLag = true;
+	// AllySpringArm->CameraLagSpeed = 5;
+	// AllySpringArm->AddLocalOffset(FVector(0,-400,0));
+	//
+	//
+	// AllyShipMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("AllyShipMesh"));
+	// AllyShipMesh->SetupAttachment(AllySpringArm, USpringArmComponent::SocketName);
+	// AllyShipMesh->SetSimulatePhysics(true);
+	// AllyShipMesh->SetEnableGravity(false);
+	// AllyShipMesh->BodyInstance.bLockXRotation = true;
+	// AllyShipMesh->BodyInstance.bLockYRotation = true;
+	// AllyShipMesh->SetVisibility(true);
 	
 	MySpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MySpringArm"));
-	MySpringArm->SetupAttachment(GetRootComponent());
+	MySpringArm->SetupAttachment(SpaceShipMesh, USpringArmComponent::SocketName);
 	MySpringArm->bUsePawnControlRotation = true;
 	MySpringArm->bEnableCameraLag = true;
 	MySpringArm->bEnableCameraRotationLag = true;
