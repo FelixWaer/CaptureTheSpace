@@ -234,6 +234,4 @@ void APlayerSpaceShip::LineTraceFromCamera()
 		AimCursor->SetWorldLocation(AimLocation);
 		AimCursor->SetupAttachment(GetRootComponent());
 	}
-	
 }
-
