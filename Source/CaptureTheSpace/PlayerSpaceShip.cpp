@@ -91,6 +91,7 @@ void APlayerSpaceShip::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(CameraMovementInput, ETriggerEvent::Triggered, this, &APlayerSpaceShip::CameraMovementFunction);
 		EnhancedInputComponent->BindAction(CameraDistanceInout, ETriggerEvent::Triggered, this, &APlayerSpaceShip::CameraDistanceFunction);
 		EnhancedInputComponent->BindAction(ShootInput, ETriggerEvent::Started, this, &APlayerSpaceShip::ShootFunction);
+		EnhancedInputComponent->BindAction(ChangeCamera, ETriggerEvent::Started, this, &APlayerSpaceShip::change_Camera);
 
 		//Beam Input
 		EnhancedInputComponent->BindAction(TractorInput, ETriggerEvent::Triggered, this, &APlayerSpaceShip::TractorBeam);
@@ -119,7 +120,14 @@ void APlayerSpaceShip::CameraMovementFunction(const FInputActionValue& input)
 
 void APlayerSpaceShip::CameraDistanceFunction(const FInputActionValue& input)
 {
-	MySpringArm->TargetArmLength = FMath::Clamp(MySpringArm->TargetArmLength + (-input.Get<float>() * CameraDistanceSpeed), CameraDistanceMin, CameraDistanceMax);
+	if (StrategicView == true)
+	{
+		MySpringArm->TargetArmLength = FMath::Clamp(MySpringArm->TargetArmLength + (-input.Get<float>() * CameraDistanceSpeed), StrategicCameraDistanceMin, StrategicCameraDistanceMax);
+	}
+	else
+	{
+		MySpringArm->TargetArmLength = FMath::Clamp(MySpringArm->TargetArmLength + (-input.Get<float>() * CameraDistanceSpeed), CameraDistanceMin, CameraDistanceMax);
+	}
 }
 
 void APlayerSpaceShip::ShootFunction(const FInputActionValue& input)
@@ -144,6 +152,26 @@ void APlayerSpaceShip::ShootFunction(const FInputActionValue& input)
 
 
 	
+}
+
+void APlayerSpaceShip::change_Camera()
+{
+	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("bytt view")));
+	if (StrategicView != true)
+	{
+		MySpringArm->SetRelativeLocation(FVector(0, 0, 2000));
+		MySpringArm->SetRelativeRotation(FRotator(-90, 0, 0));
+
+		MySpringArm->bUsePawnControlRotation = false;
+		StrategicView = true;
+		return;
+	}
+
+	MySpringArm->SetRelativeLocation(FVector(0, 0, 100));
+	MySpringArm->SetRelativeRotation(FRotator(0, 0, 0));
+	MySpringArm->bUsePawnControlRotation = true;
+
+	StrategicView = false;
 }
 
 void APlayerSpaceShip::TractorBeam()

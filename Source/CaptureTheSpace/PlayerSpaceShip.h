@@ -20,7 +20,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	UStaticMeshComponent* SpaceShipMesh;
 
-	//AllyStatickMesh
+	//AllyStaticMesh
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MyVariables")
 	UStaticMeshComponent* AllyShipMesh;
 
@@ -75,12 +75,17 @@ public:
 	// Aim
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
 	class UInputAction* TractorInput;
+	// CameraChange
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Input")
+	UInputAction* ChangeCamera;
+
 	//----------------------Input Functions----------------------//
 	void MovementFunction(const FInputActionValue& input);
 	void UpDownMovementFunction(const FInputActionValue& input);
 	void CameraMovementFunction(const FInputActionValue& input);
 	void CameraDistanceFunction(const FInputActionValue& input);
 	void ShootFunction(const FInputActionValue& input);
+	void change_Camera();
 	void TractorBeam();
 	void TractorBeamStarted();
 	void TractorBeamReleased();
@@ -116,6 +121,12 @@ public:
 
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "ShootingVar")
 	float CameraLineTraceDistance = 10000;
+
+	//Strategic Camera variables
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartegicCameraVar")
+	float StrategicCameraDistanceMin = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartegicCameraVar")
+	float StrategicCameraDistanceMax = 3000.f;
 	
 	//Sounds
 	UPROPERTY(EditAnywhere)
@@ -147,5 +158,7 @@ private:
 	//Tractor Beam Variables
 	FHitResult TractorResult;
 
+	//Camera Variables
+	bool StrategicView = false;
 	
 };
