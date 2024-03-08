@@ -123,10 +123,12 @@ public:
 	float CameraLineTraceDistance = 10000;
 
 	//Strategic Camera variables
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartegicCameraVar")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StrategicCameraVar")
 	float StrategicCameraDistanceMin = 1000.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StartegicCameraVar")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StrategicCameraVar")
 	float StrategicCameraDistanceMax = 3000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StrategicCameraVar")
+	int DefenceTowerCost = 10;
 	
 	//Sounds
 	UPROPERTY(EditAnywhere)
@@ -138,6 +140,8 @@ public:
 	//What Type of bullet to shoot
 	UPROPERTY(EditAnywhere,BlueprintReadWrite, Category = "ShootingVar")
 	TSubclassOf<class ABullet> BulletClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "StrategicCameraVar")
+	TSubclassOf<class ADefenceTower> DefenceTower;
 private:
 
 	APlayerController* PlayerController;

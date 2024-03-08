@@ -19,7 +19,7 @@
 #include "Components/AudioComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "DefenceTower.h"
 
 // Sets default values
 APlayerSpaceShip::APlayerSpaceShip()
@@ -132,10 +132,31 @@ void APlayerSpaceShip::CameraDistanceFunction(const FInputActionValue& input)
 
 void APlayerSpaceShip::ShootFunction(const FInputActionValue& input)
 {
-		FActorSpawnParameters SpawnParameters;
-		SpawnParameters.Owner = this;
-		ABullet* CurrentBullet;
-		UGameplayStatics::PlaySound2D(GetWorld(),ShootingSound);
+	if (StrategicView == true && Score >= DefenceTowerCost)
+	{
+		FVector mouseLocation;
+		FVector mouseDirection;
+		FVector actorLocation = GetActorLocation();
+		PlayerController->DeprojectMousePositionToWorld(mouseLocation, mouseDirection);
+
+		FVector spawnLocation = FMath::LinePlaneIntersection(
+			mouseLocation,
+			mouseLocation + (mouseDirection * 10000.f),
+			actorLocation,
+			FVector{ 0.f, 0.f, 1.f }
+		);
+
+		AActor* spawnedTower = GetWorld()->SpawnActor<ADefenceTower>(DefenceTower, spawnLocation, GetActorRotation());
+		Score -= DefenceTowerCost;
+
+		return;
+	}
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Owner = this;
+	ABullet* CurrentBullet;
+	UGameplayStatics::PlaySound2D(GetWorld(),ShootingSound);
+
 	for(int i = 0; i<AmountOfShots;i++)
 	{
 		CurrentBullet = GetWorld()->SpawnActor<ABullet>(
@@ -149,14 +170,10 @@ void APlayerSpaceShip::ShootFunction(const FInputActionValue& input)
 			CurrentBullet->SetUpBulletTarget(HitComponent, AimLocation);
 		}
 	}
-
-
-	
 }
 
 void APlayerSpaceShip::change_Camera()
 {
-	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("bytt view")));
 	if (StrategicView != true)
 	{
 		MySpringArm->SetRelativeLocation(FVector(0, 0, 2000));
@@ -164,13 +181,14 @@ void APlayerSpaceShip::change_Camera()
 
 		MySpringArm->bUsePawnControlRotation = false;
 		StrategicView = true;
+		PlayerController->SetShowMouseCursor(true);
 		return;
 	}
 
 	MySpringArm->SetRelativeLocation(FVector(0, 0, 100));
 	MySpringArm->SetRelativeRotation(FRotator(0, 0, 0));
 	MySpringArm->bUsePawnControlRotation = true;
-
+	PlayerController->SetShowMouseCursor(false);
 	StrategicView = false;
 }
 

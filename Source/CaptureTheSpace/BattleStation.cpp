@@ -16,6 +16,7 @@ ABattleStation::ABattleStation()
 	
 	MaxHealth = 12;
 	Health = MaxHealth;
+	Tags.Add("Enemy");
 }
 
 // Called when the game starts or when spawned

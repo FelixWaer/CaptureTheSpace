@@ -39,10 +39,13 @@ public:
 
 	void SetUpBulletTarget(class UPrimitiveComponent* TargetComponent, FVector TargetLocation);
 
+	UFUNCTION(BlueprintCallable)
+	void shoot_BulletFromTower(FVector ShootDirection);
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 private:
 	void MovementFunction(float DeltaTime);
 	bool HasTarget = false;
-	
+	bool ShotByDefenceTower = false;
+	FVector DirectionShot;
 };

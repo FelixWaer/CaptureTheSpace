@@ -38,13 +38,22 @@ void ABullet::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//Movement
-	MovementFunction(DeltaTime);
-
-	//Destroy bullet if close to target
-	if ((GetActorLocation() - AimCursor->GetComponentLocation()).Length() < 10)
+	if (ShotByDefenceTower == true)
 	{
-		SetLifeSpan(0.5f);
+		FVector location = GetActorLocation();
+		location += DirectionShot * BulletSpeed * DeltaTime;
+		SetActorLocation(location);
+	}
+	else
+	{
+		//Movement
+		MovementFunction(DeltaTime);
+
+		//Destroy bullet if close to target
+		if ((GetActorLocation() - AimCursor->GetComponentLocation()).Length() < 10)
+		{
+			SetLifeSpan(0.5f);
+		}
 	}
 }
 
@@ -61,6 +70,12 @@ void ABullet::SetUpBulletTarget(UPrimitiveComponent* TargetComponent, FVector Ta
 		AimCursor->SetWorldLocation(TargetLocation);
 		HasTarget = true;
 	}
+}
+
+void ABullet::shoot_BulletFromTower(FVector ShootDirection)
+{
+	ShotByDefenceTower = true;
+	DirectionShot = ShootDirection;
 }
 
 void ABullet::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp,
